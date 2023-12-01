@@ -28,7 +28,7 @@ To Use:
 #define ROBOT_DIAMETER_IN_CM 36.947125 // Determined empirically
 #define DESIRED_TS_MS 10.0 
 
-#define DESIRED_RADIUS 6.0
+#define DESIRED_RADIUS 4.5
 
 #define COUNTS_PER_FOOT 2070.0
 #define COUNTS_PER_INCH 172.5
@@ -39,7 +39,7 @@ To Use:
 #define TURN_TO_MARKER_ERROR_BAND 0.01
 #define ANGLE_ERROR_BAND 0.01
 
-#define IS_CIRCLE_TIME true
+#define IS_CIRCLE_TIME false
 
 // Define States
 enum State {
@@ -136,7 +136,7 @@ void loop() {
         if (currentTime < 1.0) { // Add fudge factor (0.25) if Aruco marker is not immediately seen
           desiredAngle = lastPiMeasuredAngle;
         } else {
-          desiredAngle = lastPiMeasuredAngle - 0.25; // Fudge factor is determined emperically to compensate for camera delay
+          desiredAngle = lastPiMeasuredAngle - 0.32; // Fudge factor is determined emperically to compensate for camera delay
         }
         currState = TURN_TO_MARKER;
       }
@@ -152,9 +152,9 @@ void loop() {
 
       if  ( settleCountTurnMark >= 50 && !isnan(lastPiMeasuredDistance)) {
         moveStateFlag = true;
-        desiredPos = (lastPiMeasuredDistance * COUNTS_PER_INCH) - COUNTS_PER_FOOT; // Set desired position to the distance from the aruco marker minus 1 foot
+        desiredPos = (lastPiMeasuredDistance * COUNTS_PER_INCH) - (COUNTS_PER_FOOT * 1.1); // Set desired position to the distance from the aruco marker minus 1 foot
         currState = DRIVE_TO_MARKER;
-      }
+      };
       break;
 
     // tested case to try to become more accurate, found it was difficult to work with (especially considering delay);
@@ -187,10 +187,10 @@ void loop() {
 
     case TURN_RIGHT:
 
-      desiredAngle = -PI / 2.0; // Negative indicates right in this control scheme
+      desiredAngle = -(PI / 2.0 - 0.3); // Negative indicates right in this control scheme
       desiredPos = 0.0;
 
-      if ( abs(currentAngle + (PI/2.0) ) < ANGLE_ERROR_BAND ) { // Counts when within error band to allow for settling time
+      if ( abs(currentAngle + (PI/2.0 - 0.3) ) < ANGLE_ERROR_BAND ) { // Counts when within error band to allow for settling time
         settleCountTurnRight++;
       }
 
